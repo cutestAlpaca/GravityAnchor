@@ -148,6 +148,7 @@ body {
 /* Sidebar styling */
 .app-sidebar {
     width: fit-content;
+    min-width: 180px;
     flex-shrink: 0;
     border-right: 1px solid var(--border-color);
     background: rgba(7, 9, 19, 0.4);
@@ -502,6 +503,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    table-layout: fixed;
 }
 
 .conv-table th {
@@ -534,7 +536,6 @@ body {
 .conv-row-index {
     color: var(--text-dim);
     font-weight: 600;
-    width: 60px;
 }
 
 .status-badge-inline {
@@ -567,15 +568,15 @@ body {
 }
 
 .conv-title-cell {
-    max-width: 280px;
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .conv-title-text {
     font-weight: 600;
     color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .conv-id {
@@ -583,6 +584,9 @@ body {
     font-size: 11px;
     color: var(--text-dim);
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .badge-source {
@@ -623,7 +627,7 @@ body {
     font-size: 12px;
     color: var(--text-muted);
     font-family: 'JetBrains Mono', monospace;
-    max-width: 240px;
+    max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

@@ -16,9 +16,9 @@ func main() {
 
 	err := wails.Run(&options.App{
 		Title:     "GravityAnchor",
-		Width:     960,
-		Height:    700,
-		MinWidth:  800,
+		Width:     1080,
+		Height:    720,
+		MinWidth:  900,
 		MinHeight: 600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
