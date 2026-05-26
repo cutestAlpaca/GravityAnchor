@@ -147,7 +147,8 @@ body {
 
 /* Sidebar styling */
 .app-sidebar {
-    width: 240px;
+    width: fit-content;
+    flex-shrink: 0;
     border-right: 1px solid var(--border-color);
     background: rgba(7, 9, 19, 0.4);
     backdrop-filter: var(--glass-blur);
@@ -171,6 +172,7 @@ body {
     color: var(--text-dim);
     font-weight: 500;
     transition: var(--transition-smooth);
+    white-space: nowrap;
 }
 
 .step-item.active {
