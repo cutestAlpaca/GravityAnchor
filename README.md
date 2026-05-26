@@ -1,5 +1,7 @@
 # ⚓ GravityAnchor
 
+[English](README.md) | [简体中文](README_zh.md)
+
 [![Go Version](https://img.shields.io/github/go-mod/go-version/FutureisinPast/gravity-anchor?color=00ADD8&logo=go)](https://golang.org)
 [![Wails](https://img.shields.io/badge/built%20with-Wails%20v2-red)](https://wails.io)
 [![License](https://img.shields.io/github/license/FutureisinPast/gravity-anchor)](LICENSE)
