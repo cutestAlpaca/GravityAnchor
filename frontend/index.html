@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>GravityAnchor</title>
+</head>
+<body>
+<div id="app">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-brand">
+            <img id="logo" class="header-logo" alt="Logo" />
+            <span class="header-title" data-i18n="app_title">GravityAnchor</span>
+        </div>
+        <div class="header-meta">
+            <div class="language-selector" style="margin-right: 8px; display: inline-block;">
+                <select class="select-custom" id="lang-select" onchange="changeLanguage(this.value)" style="padding: 4px 8px; font-size: 12px; border-radius: 6px; font-weight: 600; height: auto;">
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                </select>
+            </div>
+            <span class="badge badge-os" id="os-badge">OS: --</span>
+            <span class="badge badge-update hidden" id="update-badge" onclick="checkUpdates()">🚀 New Update Available</span>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="app-main">
+        <!-- Sidebar Navigation Steps -->
+        <aside class="app-sidebar">
+            <ul class="step-list">
+                <li class="step-item active" id="step-nav-1">
+                    <span class="step-num">1</span>
+                    <span data-i18n="step_system_check">System Check</span>
+                </li>
+                <li class="step-item" id="step-nav-2">
+                    <span class="step-num">2</span>
+                    <span data-i18n="step_scan_resolve">Scan & Resolve</span>
+                </li>
+                <li class="step-item" id="step-nav-3">
+                    <span class="step-num">3</span>
+                    <span data-i18n="step_rebuild_db">Rebuild Database</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Dynamic Content Area -->
+        <main class="app-content">
+            <!-- Screen 1: Welcome & Path Check -->
+            <section class="screen-welcome" id="screen-welcome">
+                <div class="hero-logo-container">
+                    <div class="hero-logo-glow"></div>
+                    <img id="logo-hero" class="hero-logo" alt="Floating Hero Logo" />
+                </div>
+                <h1 class="welcome-title" data-i18n="welcome_title">Fix Your Antigravity Conversations</h1>
+                <p class="welcome-desc" data-i18n="welcome_desc">
+                    Rebuilds your local Antigravity workspace index, maps missing workspaces, restores conversation titles from brain artifacts, and injects timestamps for correct list sorting.
+                </p>
+
+                <!-- System paths diagnostics -->
+                <div class="system-card">
+                    <div class="system-card-title" data-i18n="system_paths_title">System Paths Check</div>
+                    <div class="path-list" id="path-list">
+                        <div class="path-item">
+                            <svg class="path-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <span data-i18n="sys_checking">Checking system configuration and path detection...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-glowing" id="btn-start-scan" onclick="startScanning()">
+                    <span data-i18n="btn_scan_conversations">Scan Conversations</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </section>
+
+            <!-- Screen 2: Scan Results & Action Dashboard -->
+            <section class="screen-scan-results hidden" id="screen-scan-results">
+                <!-- Statistics Grid -->
+                <div class="dashboard-grid">
+                    <div class="stat-card c-brain">
+                        <span class="stat-label" data-i18n="stat_brain_titles">Brain Titles</span>
+                        <span class="stat-value" id="stat-brain-count">0</span>
+                    </div>
+                    <div class="stat-card c-preserved">
+                        <span class="stat-label" data-i18n="stat_preserved_titles">Preserved Titles</span>
+                        <span class="stat-value" id="stat-preserved-count">0</span>
+                    </div>
+                    <div class="stat-card c-fallback">
+                        <span class="stat-label" data-i18n="stat_fallback_titles">Fallback Titles</span>
+                        <span class="stat-value" id="stat-fallback-count">0</span>
+                    </div>
+                    <div class="stat-card c-workspace">
+                        <span class="stat-label" data-i18n="stat_mapped_workspaces">Mapped Workspaces</span>
+                        <span class="stat-value" id="stat-ws-count">0 / 0</span>
+                    </div>
+                </div>
+
+                <!-- Table Filters and Search -->
+                <div class="table-section">
+                    <div class="table-controls">
+                        <div class="search-input-wrapper">
+                            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" class="search-input" id="search-box" placeholder="Search conversations by title or ID..." oninput="filterConversations()"/>
+                        </div>
+                        <div class="filter-group">
+                            <select class="select-custom" id="filter-status" onchange="filterConversations()">
+                                <option value="all">All Conversations</option>
+                                <option value="missing-ws">Missing Workspace Mapping</option>
+                                <option value="has-ws">Has Workspace Mapping</option>
+                                <option value="source-brain">Title from Brain</option>
+                                <option value="source-preserved">Title from DB</option>
+                                <option value="source-fallback">Title from Fallback</option>
+                            </select>
+                            <button class="btn-action-sm" onclick="startScanning()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                <span data-i18n="btn_rescan">Rescan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Table -->
+                    <div class="table-wrapper">
+                        <table class="conv-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 60px;" data-i18n="th_index">Index</th>
+                                <th style="width: 100px;" data-i18n="th_status">Status</th>
+                                <th style="width: 320px;" data-i18n="th_details">Conversation Details</th>
+                                <th data-i18n="th_workspace">Workspace Association</th>
+                                <th style="width: 140px; text-align: right;" data-i18n="th_action">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="conversation-rows">
+                            <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer Action Bar -->
+                <div class="action-bar">
+                    <div class="mode-selector">
+                        <label class="radio-wrapper">
+                            <input type="radio" name="fix-mode" value="auto" class="radio-custom" checked/>
+                            <span class="radio-label">Auto Workspace Mapping (Recommended)</span>
+                        </label>
+                        <label class="radio-wrapper">
+                            <input type="radio" name="fix-mode" value="auto_manual" class="radio-custom"/>
+                            <span class="radio-label">Strict Mode (Require Workspaces)</span>
+                        </label>
+                    </div>
+                    <button class="btn-submit" onclick="executeFix()">
+                        <span data-i18n="btn_rebuild_fix">🚀 Rebuild & Fix Index</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Screen 3: Overlay / Progress Modal -->
+    <div class="overlay-full hidden" id="overlay-progress">
+        <div class="modal-card">
+            <!-- SVG Gradient Definitions -->
+            <svg style="width:0;height:0;position:absolute;">
+                <defs>
+                    <linearGradient id="gradient-progress" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#6366f1" />
+                        <stop offset="100%" stop-color="#a855f7" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <div class="modal-header">
+                <h2 class="modal-title" id="progress-title" data-i18n="progress_title">Rebuilding Trajectory Index...</h2>
+                <p class="progress-status" id="progress-status-text" data-i18n="progress_status">Preparing databases and backups...</p>
+            </div>
+
+            <!-- Animated Radial Progress Bar -->
+            <div class="progress-ring-container">
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
+                    <circle class="progress-ring-indicator" id="progress-ring-bar" cx="60" cy="60" r="52" stroke-dasharray="326.72" stroke-dashoffset="326.72"></circle>
+                </svg>
+                <div class="progress-percentage" id="progress-percentage-text">0%</div>
+            </div>
+
+            <!-- Terminal log output -->
+            <div class="terminal-console" id="terminal-logs">
+                <div class="terminal-line">
+                    <span class="term-tag info">sys</span>
+                    <span class="term-msg">Initializing transaction log...</span>
+                </div>
+            </div>
+
+            <!-- Final success details (hidden during progress) -->
+            <div class="success-details hidden" id="success-summary">
+                <div class="detail-item">
+                    <span class="detail-lbl" data-i18n="detail_total">Total Rebuilt</span>
+                    <span class="detail-val" id="summary-total">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-lbl" data-i18n="detail_ws">Workspace Mappings</span>
+                    <span class="detail-val detail-val-success" id="summary-ws-mapped">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-lbl" data-i18n="detail_ts">Timestamps Injected</span>
+                    <span class="detail-val" id="summary-ts-injected">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-lbl" data-i18n="detail_status">Status</span>
+                    <span class="detail-val detail-val-success" id="summary-status-val" data-i18n="detail_perfect">✅ Perfect</span>
+                </div>
+                <div class="db-list-box" id="summary-db-results">
+                    <!-- DB results list -->
+                </div>
+            </div>
+
+            <!-- Dismiss Button (hidden during progress) -->
+            <button class="btn-dismiss hidden" id="btn-dismiss-modal" onclick="closeProgressModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span id="btn-dismiss-text" data-i18n="btn_return_dashboard">Perfect! Return to Dashboard</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="./src/main.js" type="module"></script>
+</body>
+</html>
