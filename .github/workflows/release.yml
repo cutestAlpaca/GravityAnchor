@@ -1,0 +1,128 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    name: Build macOS Universal DMG
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Build macOS Universal App
+        run: wails build -platform darwin/universal -clean
+
+      - name: Package macOS Universal DMG
+        run: ./build/package_dmg.sh
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GravityAnchor-macOS-universal
+          path: build/bin/GravityAnchor_macOS_universal.dmg
+          if-no-files-found: error
+
+  build-windows:
+    name: Build Windows AMD64 & 386 Installers
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+        shell: bash
+
+      - name: Build Windows AMD64 & 386 NSIS Installers
+        run: wails build -platform windows/amd64,windows/386 -nsis -clean
+        shell: bash
+
+      - name: Upload Windows AMD64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GravityAnchor-Windows-x64-installer
+          path: build/bin/GravityAnchor-amd64-installer.exe
+          if-no-files-found: error
+
+      - name: Upload Windows 386 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GravityAnchor-Windows-x86-installer
+          path: build/bin/GravityAnchor-386-installer.exe
+          if-no-files-found: error
+
+  publish-release:
+    name: Create GitHub Release
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: GravityAnchor-macOS-universal
+          path: ./dist
+
+      - name: Download Windows x64 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: GravityAnchor-Windows-x64-installer
+          path: ./dist
+
+      - name: Download Windows x86 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: GravityAnchor-Windows-x86-installer
+          path: ./dist
+
+      - name: List Release Files
+        run: ls -la ./dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./dist/GravityAnchor_macOS_universal.dmg
+            ./dist/GravityAnchor-amd64-installer.exe
+            ./dist/GravityAnchor-386-installer.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

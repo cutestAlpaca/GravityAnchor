@@ -7,7 +7,14 @@
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
   "author": {
-    "name": "",
+    "name": "FutureisinPast",
     "email": ""
+  },
+  "info": {
+    "companyName": "FutureisinPast",
+    "productName": "GravityAnchor",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026 FutureisinPast. All rights reserved.",
+    "comments": "Scan, restore, repair, and anchor Antigravity conversation histories."
   }
 }
