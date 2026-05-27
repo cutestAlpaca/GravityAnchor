@@ -6,6 +6,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
 
@@ -46,7 +49,7 @@ jobs:
           if-no-files-found: error
 
   build-windows:
-    name: Build Windows AMD64 & 386 Installers
+    name: Build Windows AMD64 & 386 Packages
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
@@ -68,22 +71,26 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
         shell: bash
 
-      - name: Build Windows AMD64 & 386 NSIS Installers
-        run: wails build -platform windows/amd64,windows/386 -nsis -clean
+      - name: Build Windows AMD64 NSIS Installer
+        run: |
+          wails build -platform windows/amd64 -nsis -clean
+          mkdir -p dist
+          mv build/bin/GravityAnchor-amd64-installer.exe dist/
         shell: bash
 
-      - name: Upload Windows AMD64 Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: GravityAnchor-Windows-x64-installer
-          path: build/bin/GravityAnchor-amd64-installer.exe
-          if-no-files-found: error
+      - name: Build Windows 386 Standalone Executable
+        run: |
+          wails build -platform windows/386 -clean
+          mv build/bin/gravity-anchor.exe dist/GravityAnchor_windows_x86_portable.exe
+        shell: bash
 
-      - name: Upload Windows 386 Artifact
+      - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: GravityAnchor-Windows-x86-installer
-          path: build/bin/GravityAnchor-386-installer.exe
+          name: GravityAnchor-Windows-artifacts
+          path: |
+            dist/GravityAnchor-amd64-installer.exe
+            dist/GravityAnchor_windows_x86_portable.exe
           if-no-files-found: error
 
   publish-release:
@@ -100,16 +107,10 @@ jobs:
           name: GravityAnchor-macOS-universal
           path: ./dist
 
-      - name: Download Windows x64 Artifact
+      - name: Download Windows Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: GravityAnchor-Windows-x64-installer
-          path: ./dist
-
-      - name: Download Windows x86 Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: GravityAnchor-Windows-x86-installer
+          name: GravityAnchor-Windows-artifacts
           path: ./dist
 
       - name: List Release Files
@@ -121,7 +122,7 @@ jobs:
           files: |
             ./dist/GravityAnchor_macOS_universal.dmg
             ./dist/GravityAnchor-amd64-installer.exe
-            ./dist/GravityAnchor-386-installer.exe
+            ./dist/GravityAnchor_windows_x86_portable.exe
           draft: false
           prerelease: false
         env:
